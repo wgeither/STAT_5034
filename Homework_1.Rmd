@@ -1,0 +1,41 @@
+---
+title: "Homework_1"
+author: "Warren Geither"
+date: "8/29/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+In class we discussed the Binomial distribution. Another discrete distribution is the Poisson distribution. 
+
+a.) Look online and in your book collection to read about the Poisson distribution. Is f(y|lambda) a pdf or     pmf?
+    - pmf
+
+b.) What is the expected value E(y)? Prove it.
+    - see attached pdf
+
+c.) What is the variance var(y)? Prove it.
+    - see attached pdf
+
+d.) The number of mistakes a letter stuffing robot makes in an hour can be considered to be a Poisson     random variable. Let the random variable Y have a Poisson distribution with parameter lambda=2.3.
+
+  - What is the probability that the robot makes 2 mistakes in an hour?
+```{r}
+dpois(2, lambda = 2.3)
+```
+ 
+  - What is the probability the robot makes at least 2 mistakes in an hour?
+```{r}
+1 - sum(dpois(0:2, lambda = 2.3))
+```
+
+  - What is the the probability that the robot makes 2.3 mistakes in an hour?
+
+  - What is the probability that the robot makes 0 mistakes in an hour?
+
+  - What is the probability that the robot makes less than 6 mistakes in an hour?
