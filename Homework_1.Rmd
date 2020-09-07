@@ -1,5 +1,5 @@
 ---
-title: "Homework_1"
+title: "STAT 5034 Homework 1"
 author: "Warren Geither"
 date: "8/29/2020"
 output: pdf_document
@@ -9,33 +9,64 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Honor Code: “I have neither given nor received unauthorized assistance on this assignment.” 
+
 ## Problem 1
 
-In class we discussed the Binomial distribution. Another discrete distribution is the Poisson distribution. 
+a.) pmf
 
-a.) Look online and in your book collection to read about the Poisson distribution. Is f(y|lambda) a pdf or     pmf?
-    - pmf
+b.)
+$$
+\begin{aligned}
+E(y) &= \sum_{y=0}^\infty y\frac{\lambda^{y}e^{-\lambda}}{y!} \\
+&= \sum_{y=1}^\infty y\frac{\lambda^{y}e^{-\lambda}}{y!} \\
+&= e^{-\lambda}\sum_{y=1}^\infty \frac{\lambda^{y}}{(y-1)!} \text{ , sub } x=y-1\\
+&= e^{-\lambda}\sum_{x=0}^\infty \frac{\lambda^{x+1}}{(x)!} \\
+&= \lambda e^{-\lambda}\sum_{x=0}^\infty \frac{\lambda^{x}}{(x)!} \text{ , using the identity } e^x=\sum_{k=0}^\infty \frac{x^k}{k!}\\
+\\
+&= {\lambda}e^{-\lambda}e^{\lambda} \\
+&= {\lambda}\frac{e^{-\lambda}}{e^{\lambda}} \\
+&= (\lambda)(1) \\
+&= \lambda \text{ }_\blacksquare
+\end{aligned}
+$$
 
-b.) What is the expected value E(y)? Prove it.
-    - see attached pdf
+c.) 
+$$
+\begin{aligned}
+E(y^2) &= \sum_{y=0}^\infty y^2\frac{\lambda^{y}e^{-\lambda}}{y!} \\ 
+&= e^{-\lambda}\sum_{y=0}^\infty y\frac{\lambda^{y}}{(y-1)!} \text{ , the zero term is 0 } \\
+&= e^{-\lambda}\sum_{y=1}^\infty y\frac{\lambda^{y}}{(y-1)!} \text{ , sub } x=y-1\\
+&= e^{-\lambda}\sum_{x=0}^\infty (x+1)\frac{\lambda^{x+1}}{(x)!}  \text{ , pulling out } \lambda\\
+&= {\lambda}e^{-\lambda}\sum_{x=0}^\infty (x+1)\frac{\lambda^{x}}{(x)!}  \text{ , distributing we get}\\
+&= {\lambda}e^{-\lambda}(\sum_{x=0}^\infty (x)\frac{\lambda^{x}}{(x)!} + \sum_{x=0}^\infty (1)\frac{\lambda^{x}}{(x)!}) \text{ , using the identity } e^x=\sum_{k=0}^\infty \frac{x^k}{k!}\\
+&= {\lambda}e^{-\lambda}(\sum_{x=0}^\infty (x)\frac{\lambda^{x}}{(x)!} + e^{\lambda})\text{ , redistributing } e^{-\lambda} \\
+&= {\lambda}(\sum_{x=0}^\infty (x)\frac{e^{-\lambda}\lambda^{x}}{(x)!} + e^{-\lambda}e^{\lambda}) \text{ , recognizing we know have } E(x)\\
+&= {\lambda}(\lambda + \frac{e^{\lambda}}{e^{\lambda}})\\
+&= {\lambda}(\lambda + 1)\\
+&= (\lambda^2 + \lambda)\\
+\implies Var(y) &= E(y^2)-(E(y))^2 \\
+&= (\lambda^2 + \lambda) - (\lambda)^2 \\
+&= \lambda \text{ }_\blacksquare
+\end{aligned}
+$$
 
-c.) What is the variance var(y)? Prove it.
-    - see attached pdf
-
-d.) The number of mistakes a letter stuffing robot makes in an hour can be considered to be a Poisson     random variable. Let the random variable Y have a Poisson distribution with parameter lambda=2.3.
+d.)
 
   - What is the probability that the robot makes 2 mistakes in an hour?
 ```{r}
 dpois(2, lambda = 2.3)
+(2.3^2)*(exp(-2.3))/2
 ```
  
   - What is the probability the robot makes at least 2 mistakes in an hour?
 ```{r}
-1 - sum(dpois(0:2, lambda = 2.3))
+1 - sum(dpois(0:1, lambda = 2.3))
+1- (((2.3^0)*(exp(-2.3))/1) + ((2.3^1)*(exp(-2.3))/1))
 ```
 
   - What is the the probability that the robot makes 2.3 mistakes in an hour?
-    - the domain is the Natural number union {0}, so we cant put 2.3 in the pmf
+    - the domain is the Natural number union {0}, so we 2.3 isnt possible (i.e P(X=2.3)=0)
 ```{r}
 dpois(2.3, lambda = 2.3)
 ```
@@ -43,14 +74,14 @@ dpois(2.3, lambda = 2.3)
   - What is the probability that the robot makes 0 mistakes in an hour?
 ```{r}
 dpois(0, lambda = 2.3)
+((2.3^0)*(exp(-2.3))/1)
 ```
 
   - What is the probability that the robot makes less than 6 mistakes in an hour?
 ```{r}
 sum(dpois(0:5, lambda = 2.3))
 ```
-e.) The following data measure the number of children arriving at a local daycare between the hours of 8-9 AM for 25 days. Assume these data arise from a Poisson distribution. 
-  - Based on the data, there are an average of (approximately) 7 children per day dropped off at the        daycare between 8-9AM
+e.) The sample mean is a "good" estimator because it is the maximum likelihood estimator for lambda
 ```{r}
 y<-c(11,7,2,7,4,8,13,3,6,6,15,8,2,4,5,11,11,4,9,3,9,8,5,9,6)
 
@@ -58,10 +89,41 @@ est_lambda = sum(y)/25
 
 print(est_lambda)
 ```
-## Problem 3
-The following data set includes measurements on: X, temperature (degrees Fahrenheit), and y, percent butterfat for 10 cows across 20 consecutive days. These data are courtesy of Dr. Jason Osborne at NCSU.
+## Problem 2
 
-a.) Conduct a descriptive analysis of these data using graphics and summary statistics. Write a few sentences to interpret your analysis in the context of the problem.
+a.)
+$$
+g(y)=k(1+y)^{-k-1} \\
+\begin{aligned}
+&\lim_{n \to \infty}\int_{0}^n k(1+y)^{-k-1}dy \\
+&= \lim_{n \to \infty} \frac{k}{-k}(1+y)^{-k} \Big|_0^n dy \\
+&= \lim_{n \to \infty} -1(1+y)^{-k} \Big|_0^n dy \\
+&= \lim_{n \to \infty} [-1(1+n)^{-k}]-[-1(1+0)^{-k}] \\
+&= \lim_{n \to \infty} [\frac{-1}{(1+n)^{k}}]+[\frac{1}{1^{k}}] \\
+&= [0]+[1] \\
+&= 1 \\
+\text{Thus g(y) is a pdf.}
+\end{aligned}
+$$
+
+b.) 
+$$
+g(y)=ky^{-k-1}; y>=1 \\
+\begin{aligned}
+&\lim_{n \to \infty}\int_{1}^n ky^{-k-1}dy \\
+&= \lim_{n \to \infty} \frac{k}{-k}(y)^{-k} \Big|_1^n dy \\
+&= \lim_{n \to \infty} -1(y)^{-k} \Big|_1^n dy \\
+&= \lim_{n \to \infty} [-1(n)^{-k}]-[-1(1)^{-k}] \\
+&= \lim_{n \to \infty} [\frac{-1}{(n)^{k}}]+[\frac{1}{1^{k}}] \\
+&= [0]+[1] \\
+&= 1 \\
+\text{Thus g(y) is a pdf.}
+\end{aligned}
+$$
+
+## Problem 3
+
+a.) The temperature is between 37 and 65 with a mean of 54.10. There is 1 outlier  value for the percent butterfat .446% but the first quartile starting at 4.6% This could be do to some kind of measurement error and we may want to remove the data for further analysis. Looking at the scatterplot, we can see what appears to be a small negative correlation between percent butterfat and temperature. 
 ```{r}
 # temperature vector
 x <- c(64,65,65,64,61,55,39,41,46,59,56,56,62,37,37,45,57,58,60,55)
@@ -72,60 +134,76 @@ y <- c(4.65,4.58,4.67,4.60,4.83,4.55,5.14,4.71,4.69,4.65,4.36,4.82,4.65,4.66,4.9
 # bring in ggplot
 library("ggplot2")
 
+# bring in knitr
+library("knitr")
+
 # create dataframe
 df = data.frame("temp" = x, "pfb" = y)
 
-# display data
-print(df)
+# Check out what the data looks like
+kable(head(df,10))
 ```
+
 ```{r}
 # run summary stats 
-summary(df)
+kable(summary(df))
 ```
 
 ```{r}
-# scatterpolot for temp vs. pbf
-ggplot(data = df) +
-  geom_point(mapping = aes(x,y))
+# scatterplot for temp vs. pbf
+ggplot(data = df, aes(x=temp,y=pfb)) +
+  geom_point() +
+  geom_smooth(method=lm)
 ```
-  - The temperature is between 37 and 65 with a mean of 54.10. There is 1 outlier  value for the percent butterfat .446% but the first quartile starting at 4.6% This could be do to some kind of measurement error and we may want to remove the data for further analysis. Looking at the scatterplot, we can see what appears to be a small negative correlation between percent butterfat and temperature. 
-
-
-b.) Compute and report Pearson’s sample correlation coefficient for these data. What two aspects of the relationship between temperature and butterfat are described by this correlation? Write a few sentences to interpret this statistic. 
 ```{r}
-# calculate pearson's coorelation coefficient
-cor(x,y, method="pearson")
-```
-  - This coefficient describes the strength and direction of the linear relationship between these variables. They are negatively correlated (as temperature rises, percent of butterfat goes down), however the relationship is not very strong since it is in between -1 and 0.
+# remove outlier
+df_outlier_removed = df[-c(20), ]
 
-c.) Describe whether the assumptions underlying your analyses in parts (a) and (b) are valid. Do any aspects of this analysis concern you?
-  - The outlier concerns me, but that could be removed. 
+# scatterplot for temp vs. pbf with outlier removed
+ggplot(data = df_outlier_removed, aes(x=temp,y=pfb)) +
+  geom_point() +
+  geom_smooth(method=lm)
+```
+b.) Pearson's correlation coefficient describes the strength and direction of a linear relationship between variables. 
+
+When the outlier is included, they are negatively correlated (as temperature rises, percent of butterfat goes down), however the relationship is not very strong since it is only approximately -0.1.
+
+When the outlier is not included, they are still negatively correlated, however the relationship is much stronger with the coefficient being much closer to -1 at approximately -0.47
+
+```{r}
+# calculate pearson's correlation coefficient
+temp = df[1]
+pfb = df[2]
+cor(x=temp, y=pfb, method="pearson")
+
+# check out what the coefficient is with removal of the outlier
+temp_2 = df_outlier_removed[1]
+pfb_2 = df_outlier_removed[2]
+cor(x=temp_2, y=pfb_2, , method="pearson")
+```
+
+c.) The outlier concerned me as I am assuming it is some type of measurement error. I would need to ask Dr. Osborne more about the data to confirm this. 
 
 
 ## Problem 4
 
-Are the following quantities statistics or parameters? Explain your reasoning.
+a.) Parameter. Since its the true "average" of the whole population.
 
-a.) Joseph wonders what the true average Intellectual quotient (IQ) score is among all first year         graduate students in the United States.
-    -  Parmaeter. Since its the true average of the whole population.
+b.) Statistic. Because its based on a sample, not all of her customers did the survey (more than likely)
 
-b.) Based on an online survey completed by shoppers of a pet supply chain, Jennifer calculates that         32% of respondents are current or previous cat owners.
-    - statistics, because its based on a sample, not all of her customers did the survey (probably)
-
-c.) After a remarkable effort, the Census Bureau successfully counts every single person in the             country. Is this count a statistic or a parameter?
-    - parameter. Since its the true number of people in the US
+c.) Parameter & Statistic. Since its the true number of people in the US and was also their sample. 
     
 ## Problem 5
-Determine the type of the following variables (cf. Figure 1.3 in course notes).
-(a) Tree diameter - Continuous
-(b) Salary - Discrete
-(c) Salary ranges - Ordinal
-(d) A cow’s annual milk yield - Continuous
-(e) Number of defective light bulbs out of 100 - Count
-(f) Presence of a species in an ecosystem - Binary
-(g) Soybean lines - Nominal
-(h) Total cholesterol level - Continuous
-(i) Presence of larvae in a cm3 of soil - Binary
-(j) Number of flaws on a silicon wafer - Count
-(k) Fat content of milk - Continuous
+
+(a) Continuous
+(b) Continuous
+(c) Ordinal
+(d) Continuous
+(e) Count
+(f) Binary
+(g) Nominal
+(h) Continuous or ordinal (if its in ranges)
+(i) Binary
+(j) Count
+(k) Continuous
   
