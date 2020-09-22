@@ -358,7 +358,7 @@ c.)
     
 $$
 \begin{aligned}
-&\text{Median remains unchanged for both } X \text{ and } U \\
+&\text{The median's position remains unchanged for both } X \text{ and } U \\
 &\text{Denote median as } M \\
 &\text{If n is odd, } M = \frac{n+1}{2}th \text{ observation} \\
 &\text{If n is even, } M = \frac{\frac{n+1}{2}th \text{ } obs + \frac{n}{2}th \text{ } obs}{2} \\
@@ -371,10 +371,11 @@ $$
 $$
 \begin{aligned}
 \text{Prove: } E(\bar X) = \mu \\
-E(\bar X) &= E(\frac{1}{n}\sum_{i=1}^n x_i) \\
-&= \frac{1}{n} E(\sum_{i=1}^n x_i) \\
+E(\bar X) &= E(\frac{1}{n}\sum_{i=1}^n x_i) \text{ , pull the constant out}\\
+&= \frac{1}{n} E(\sum_{i=1}^n x_i) \text{ , by linearity we can move E()} \\
 &= \frac{1}{n} \sum_{i=1}^n E(x_i) \\
 &= \frac{1}{n} \sum_{i=1}^n \mu \\
+&= \frac{1}{n} n \mu \\
 &= \mu \text{ } _\blacksquare
 \end{aligned}
 $$
@@ -383,14 +384,14 @@ $$
 \begin{aligned}
 \text{Prove: } E(S^2) = \hat \sigma^2\\
 E(S^2) &= E(\frac{\sum(x_i-\bar x)^2}{n-1}) \\
-&= \frac{1}{n-1}E(\sum(x_i-\bar x)^2) \\
-&= \frac{1}{n-1} E(\sum x_i^2-2x_i \bar x + \bar x^2) \\
+&= \frac{1}{n-1}E(\sum(x_i-\bar x)^2) \text{ , expanding we get}\\
+&= \frac{1}{n-1} E(\sum x_i^2-2x_i \bar x + \bar x^2) \text{ , distribute sigma}\\
 &= \frac{1}{n-1}E (\sum x_i^2- \sum 2x_i \bar x + \sum \bar x^2) \\
-&= \frac{1}{n-1}E (\sum x_i^2- 2 \bar x \sum x_i  + n \bar x^2) \\
+&= \frac{1}{n-1}E (\sum x_i^2- 2 \bar x \sum x_i  + n \bar x^2) \text{ , solving for } \sum x_i\\
 &= \frac{1}{n-1}E (\sum x_i^2- 2 \bar x * n \bar x  + n \bar x^2) \\
-&= \frac{1}{n-1}E (\sum x_i^2 -  n \bar x^2) \\
-&= \frac{1}{n-1}\sum E(x_i^2) -  E(n \bar x^2) \\
-&= \frac{1}{n-1}\sum (\sigma^2 + \mu^2) -  n(\frac{\sigma^2}{n}+\mu^2) \\
+&= \frac{1}{n-1}E (\sum x_i^2 -  n \bar x^2) \text{ , using linearity }\\
+&= \frac{1}{n-1}\sum E(x_i^2) -  E(n \bar x^2) \text{ , subbing in for known identites we get}\\
+&= \frac{1}{n-1}\sum (\sigma^2 + \mu^2) -  n(\frac{\sigma^2}{n}+\mu^2) \text{ , evaluating sigma for the left term }\\
 &= \frac{1}{n-1} (n\sigma^2 + n\mu^2 -  \sigma^2-n\mu^2) \\
 &= \frac{1}{n-1} (n\sigma^2 -  \sigma^2) \\
 &= \frac{1}{n-1} (n -  1) \sigma^2\\
