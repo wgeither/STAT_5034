@@ -1,0 +1,233 @@
+---
+title: "Inference_Exam1_Warren_Geither"
+author: "Warren Geither"
+date: "10/1/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(tree)
+library(party)
+library(partykit)
+```
+
+```{r intial_ELT, echo = FALSE, results = "hide"}
+# load in file from working directory
+data_df <- read.csv2("data for problem 2.csv", sep=",")
+
+# dim of data
+dim(data_df)
+
+# check it out
+head(data_df)
+
+# change Edu column to numeric since its number of years
+data_df$Edu <- as.numeric(data_df$Edu)
+
+# change lnk column to numeric since its log number
+data_df$lnk <- as.numeric(data_df$lnk)
+
+# change frp column to character since its non-numeric
+data_df$grp <- as.factor(data_df$grp)
+
+levels(data_df$grp) <- c("No dependency"
+                         ,"Cigarette dependence only"
+                         ,"Alcohol dependence only"
+                         ,"Cocaine dependence only"
+                         ,"Cigarette and alcohol dependence"
+                         ,"Cigarette and cocaine dependence"
+                         ,"Alcohol and cocaine dependence"
+                         ,"Cigarette, alcohol, and cocaine dependence")
+
+# label the levels so they plot nice
+levels(data_df$grp) <- c("1"
+                         ,"2"
+                         ,"3"
+                         ,"4"
+                         ,"5"
+                         ,"6"
+                         ,"7"
+                         ,"8")
+```
+
+Taking a look at our 5 number summary. We can see see the average age for our study is around 40, average number of years in education is 12, and average delay discount is negative  4. Also notice the ranges for Age (18 - 65), Edu (7 - 22), and lnk (-12 - 4).
+
+```{r echo=FALSE}
+# print summary
+knitr::kable(summary(data_df[1:3]))
+```
+
+Next we'll look at the distribution of our variables.
+
+```{r, echo=FALSE}
+# frequency of Age
+plot1 <- ggplot(data=data_df, aes(Age)) +
+          geom_bar(fill="#0073C2FF") +
+          theme_pubclean()
+
+# frequency of Edu
+plot2 <- ggplot(data=data_df, aes(Edu)) +
+          geom_bar(fill="#0073C2FF") +
+          theme_pubclean()
+
+# frequency of grp
+plot3 <- ggplot(data=data_df, aes(grp)) +
+          geom_bar(fill="#0073C2FF") +
+          theme_pubclean()
+
+# plot all on same page
+ggarrange(plot1, plot2, plot3,
+          labels = c("Age", "Edu", "grp"),
+          ncol = 2, nrow = 2)
+```
+We can see age is fairly constant with maybe a slight bias towards >=40. We can
+clearly see the mean and mode of Education at 12 years. And notice we have the most subjects in gropus 1 & 2 (No dependence & Cigarette only dependence).
+
+Now, if we will be using these data in any kind of predictive/classification model
+, we need to make sure that there is no "multicolinearity." Meaning that our predictive 
+variables have no relationship with each other. We need them all to be independent
+so that we can isolate the effect each one has on the response variable.
+
+All these plots show us is that there does not appear to be any multicolinearity
+going on.
+
+```{r scatterplots, echo=FALSE}
+# scatter plot matrix of age, edu, and lnk
+pairs(data_df[1:3])
+```
+
+Next we'll look at how each of our variables relate to the response, dependency status.
+
+```{r grp_vs_lnk, echo=FALSE}
+# summary table of lnk by group
+lnk_summary_df <- data_df %>% 
+                    group_by(grp) %>% 
+                    summarize(min = min(lnk)
+                              , q1 = quantile(lnk, 0.25)
+                              , mean = mean(lnk)
+                              , median = median(lnk)
+                              , q3 = quantile(lnk, 0.75)
+                              , max = max(lnk))
+
+# print summary table
+knitr::kable(lnk_summary_df)
+
+# boxplot of grp vs lnk
+ggplot(data_df, aes(x=grp, y=lnk, fill=grp)) + 
+    geom_boxplot() +
+    ggtitle("Dependency Status vs. Delay Discount") +
+    labs(x="Dependency Status", y="Delay Discount") +
+    theme(legend.position = "none")
+```
+
+Average delay discounts hover above or below -5. Deviation from this can be seen
+in group 1 which has a lower median delay discount. You'll notice higher delay
+discounts in groups that are dependent upon stimulants (cocaine & cigarettes).
+And lower delay discount in group 3 when only a depressant (alcohol) is depended on.
+
+Switching over to look at Age as it relates to Dependency Status.
+
+```{r boxplot_grp_vs_age, echo=FALSE}
+# summary of age by group
+age_summary_df <- data_df %>% 
+                    group_by(grp) %>% 
+                    summarize(min = min(Age)
+                              , q1 = quantile(Age, 0.25)
+                              , mean = mean(Age)
+                              , median = median(Age)
+                              , q3 = quantile(Age, 0.75)
+                              , max = max(Age))
+
+# print table
+knitr::kable(age_summary_df)
+
+# boxplot of grp vs Age
+ggplot(data_df, aes(x=grp, y=Age, fill=grp)) + 
+    geom_boxplot() +
+    ggtitle("Dependency Status vs. Age") +
+    labs(x="Dependency Status", y="Age") +
+    theme(legend.position = "none") 
+```
+It seems subjects younger than 42 are more likely to be in the first 2 groups, 
+while older subjects are in the latter.
+
+Looking at education...
+
+```{r boxplot_grp_vs_edu, echo=FALSE}
+# summary of edu by group
+edu_summary_df <- data_df %>% 
+                    group_by(grp) %>% 
+                    summarize(min = min(Edu)
+                              , q1 = quantile(Edu, 0.25)
+                              , mean = mean(Edu)
+                              , median = median(Edu)
+                              , q3 = quantile(Edu, 0.75)
+                              , max = max(Edu))
+
+# print table
+knitr::kable(edu_summary_df)
+
+# boxplot of grp vs Edu
+ggplot(data_df, aes(x=grp, y=Edu, fill=grp)) + 
+    geom_boxplot() +
+    ggtitle("Dependency Status vs. Edu") +
+    labs(x="Dependency Status", y="Edu") +
+    theme(legend.position = "none")  
+```
+
+Again we see groups hovering around the average of 12 years. Also we'll see that in the first 3 groups the median education years looks slightly higher than the other 5 groups. There also seems to more spread in groups 6, 7, 8, all groups where cocaine is coupled with another substance. 
+
+## b.) 
+
+```{r class_tree, echo=FALSE}
+# fit tree
+data_tree <- tree(grp~., data = data_df)
+
+# plotting tree
+plot(data_tree,lwd=2)
+text(data_tree,cex=1.3)
+title(main='Classification tree for Depedency Status')
+
+# get the number of misclassifications
+summary(data_tree)
+```
+```{r cross_validation, echo = FALSE, results = "hide"}
+# run cross validation on the tree
+test <- cv.tree(data_tree, FUN = prune.misclass)
+
+# plot new optimal tree
+prune_data_tree = prune.misclass(data_tree, best = 6)
+#plot(prune_data_tree)
+#text(data_tree,cex=1.3)
+```
+(i) Age and lnk because their branches are the biggest.
+
+(ii) 0.6941
+  
+(iii) No, they did not fit into any of the splits defined by the tree
+
+(iv) Broadly speaking, I think it agrees. In my EDA I said age as a split for groups 1 &        2. Also it looked like there were differences in lnk.
+    
+(v) It has a pretty high misclassification rate, so I did cross validation to see if a different size tree would help, but it already has the optimal number of branches. 
+
+## c.) 
+
+```{r pretty_tree, echo=FALSE}
+# create new tree
+party_tree = ctree(grp~Age + Edu + lnk, data = data_df)
+plot(party_tree, main="Dependecy Status Tree")
+```
+
+(ii) There are differences. The party package uses statistical test to 
+     fit the best tree while tree just uses binary recursive partitioning.
+    - references:
+      - https://cran.r-project.org/web/packages/partykit/partykit.pdf
+      - https://cran.r-project.org/web/packages/tree/tree.pdf
+      
+## Appendix
+```{r ref.label=knitr::all_labels(), echo = T, eval = F}
+```
